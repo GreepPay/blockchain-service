@@ -6,4 +6,4 @@ file = "src/schema.rs"
 custom_type_derives = ["diesel::query_builder::QueryId", "Clone"]
 
 [migrations_directory]
-dir = "/Users/mac/Documents/www/Shoppoint/Backend/experiments/rust/rust_backend_template/models/migrations"
+dir = "/Users/mac/Documents/www/GreepPay/blockchain/models/migrations"
