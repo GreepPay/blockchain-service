@@ -19,3 +19,6 @@ serde = { version = "1.0.200", features = ["derive"] }
 bigdecimal = { version = "0.4.7" }
 mockall = "0.13.1"
 tokio = { version = "1.30.0", features = ["full"] }
+log = "0.4"
+serde_json = "1.0"
+thiserror = "1.0"

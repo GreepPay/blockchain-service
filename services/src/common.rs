@@ -45,6 +45,7 @@ pub mod common {
 
         let new_transaction = NewTransaction {
             id: Uuid::new_v4(),
+            // id: Uuid::new_v4(),
             source_account_id: Uuid::parse_str(source_account.to_string().as_str()).unwrap(),
             destination_account_id: Uuid::parse_str(destination_account.to_string().as_str()).unwrap(),
             transaction_hash: hash.as_str(),

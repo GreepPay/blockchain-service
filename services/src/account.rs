@@ -40,6 +40,7 @@ pub mod account {
     /// 
     /// # Returns
     /// * `Result<Account, Error>` - The account if found, or an error if not
+      // Get account
     pub async fn get_account(account_id: &str) -> Result<Account, Error> {
         let mut db_connection = establish_connection().await.unwrap();
         let account_uuid = Uuid::parse_str(account_id).unwrap();
@@ -59,7 +60,7 @@ pub mod account {
         let mut db_connection = establish_connection().await.unwrap();
         let account = models::schema::accounts::table.filter(models::schema::accounts::stellar_address.eq(stellar_address)).first(&mut db_connection).await?;
         Ok(account)
-    }
+    }  
 
     /// Retrieves a paginated list of accounts
     /// 
@@ -119,7 +120,7 @@ pub mod account {
             .get_result(&mut db_connection)
             .await?;
 
-        // Save encrypted key
+        // Save encrypted key  //shadowing right?
         let new_encrypted_key: Vec<u8> =
             encrypt_private_key(new_stellar_account.secret_key.as_str().as_bytes()).unwrap();
 
@@ -314,3 +315,9 @@ mod tests {
         }
     }
 }
+
+
+
+
+
+// https://github.com/GreepPay/blockchain-service.git

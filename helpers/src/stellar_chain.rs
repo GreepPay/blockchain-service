@@ -16,7 +16,7 @@ pub struct NewStellarAccount {
 
 /// Handles interactions with the Stellar blockchain network
 pub struct StellarChain {
-    client: Server,
+    pub client: Server,
     network: Network,
     server_url: String,
 }
@@ -38,7 +38,6 @@ impl StellarChain {
     pub fn create_new_account(&self) -> Result<NewStellarAccount, Error> {
         // Generate a random key pair
          let mut new_keypair = Keypair::random().unwrap();
-
          let secret_key = new_keypair.secret_key().unwrap();
          let public_key = new_keypair.public_key();
 
