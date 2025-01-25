@@ -1,19 +1,19 @@
 pub mod payment {
     use anyhow::Error;
+    use bigdecimal::BigDecimal;
+    use chrono::Utc;
+    use diesel::insert_into;
+    use diesel::prelude::*;
     use helpers::{
         common::{decrypt_private_key, encrypt_private_key},
         stellar_chain::StellarChain,
     };
-    use stellar_base::asset::{Asset, CreditAsset};
-    use stellar_sdk::Keypair;
-    use reqwest::Response;
-    use diesel::prelude::*;
-    use diesel::insert_into;
     use models::models::Transaction;
     use models::schema::transactions;
+    use reqwest::Response;
+    use stellar_base::asset::{Asset, CreditAsset};
+    use stellar_sdk::Keypair;
     use uuid::Uuid;
-    use bigdecimal::BigDecimal;
-    use chrono::Utc;
 
     /// Establish a trustline for a non-native asset.
     pub async fn establish_trustline_for_non_native_asset(
@@ -41,6 +41,7 @@ pub mod payment {
         sender_secret: &str,
         receiver_public_key: &str,
         amount: u64,
+        status: &str,
     ) -> Result<Response, Error> {
         send_payment(
             sender_secret,
@@ -48,6 +49,7 @@ pub mod payment {
             Asset::Native,
             "XLM".to_string(),
             amount,
+            status,
         )
         .await
     }
@@ -59,6 +61,7 @@ pub mod payment {
         asset_code: &str,
         asset_issuer: &str,
         amount: u64,
+        status: &str,
     ) -> Result<Response, Error> {
         let asset = CreditAsset::new(
             asset_code.to_string(),
@@ -71,6 +74,7 @@ pub mod payment {
             Asset::Credit(asset),
             asset_code.to_string(),
             amount,
+            status,
         )
         .await
     }
@@ -91,7 +95,12 @@ pub mod payment {
 
         // Send the payment
         let response = stellar_chain
-            .send_asset(sender_keypair.clone(), receiver_public_key.to_string(), asset, amount)
+            .send_asset(
+                sender_keypair.clone(),
+                receiver_public_key.to_string(),
+                asset,
+                amount,
+            )
             .await?;
 
         // Save the transaction to the database
@@ -106,7 +115,7 @@ pub mod payment {
             asset_code,
             memo: None,
             created_at: Some(Utc::now().naive_utc()),
-            status: status.to_string(), 
+            status: status.to_string(),
         };
 
         insert_into(transactions::table)
