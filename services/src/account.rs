@@ -320,4 +320,3 @@ mod tests {
 
 
 
-// https://github.com/GreepPay/blockchain-service.git
