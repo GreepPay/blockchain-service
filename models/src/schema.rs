@@ -15,7 +15,7 @@ diesel::table! {
     encrypted_keys (id) {
         id -> Uuid,
         account_id -> Uuid,
-        encrypted_key -> Bytea,
+        encrypted_key -> Binary,
         created_at -> Nullable<Timestamp>,
     }
 }

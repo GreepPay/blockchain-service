@@ -3,11 +3,17 @@ pub mod common {
     use anyhow::{Error, Ok};
     use bigdecimal::BigDecimal;
     use diesel_async::RunQueryDsl;
+    use helpers::common::decrypt_private_key;
+    use models::models::AccountWithKey;
     use models::{common::establish_connection, models::NewTransaction, schema};
     use stellar_base::{Network, PublicKey};
     use reqwest::Response;
     use stellar_sdk::types::SubmitTransactionResponse;
+    use stellar_sdk::Keypair;
     use uuid::Uuid;
+    use diesel::QueryDsl;
+    use diesel::ExpressionMethods;
+    use diesel::JoinOnDsl;
 
     /// Returns the Stellar network (testnet or public) based on the CHAIN_ENVIRONMENT environment variable
     /// 
@@ -45,6 +51,7 @@ pub mod common {
 
         let new_transaction = NewTransaction {
             id: Uuid::new_v4(),
+            // id: Uuid::new_v4(),
             source_account_id: Uuid::parse_str(source_account.to_string().as_str()).unwrap(),
             destination_account_id: Uuid::parse_str(destination_account.to_string().as_str()).unwrap(),
             transaction_hash: hash.as_str(),
@@ -64,5 +71,38 @@ pub mod common {
             .await?;
         
         Ok(())
+    }
+
+    pub async fn get_account_from_id(account_id: String) -> Result<(AccountWithKey, Keypair), Error> {
+
+        let mut db_connection = establish_connection().await.unwrap();
+
+        let account_uuid = Uuid::parse_str(account_id.as_str()).unwrap();
+
+        // Get account
+        let account =
+            models::schema::accounts::table
+                .inner_join(models::schema::encrypted_keys::table.on(
+                    models::schema::encrypted_keys::account_id.eq(models::schema::accounts::id),
+                ))
+                .filter(models::schema::accounts::id.eq(account_uuid))
+                .select((
+                    models::schema::accounts::id,
+                    models::schema::accounts::stellar_address,
+                    models::schema::accounts::account_type,
+                    models::schema::accounts::created_at,
+                    models::schema::accounts::updated_at,
+                    models::schema::accounts::status,
+                    models::schema::encrypted_keys::encrypted_key,
+                ))
+                .first::<AccountWithKey>(&mut db_connection)
+                .await?;
+
+        let decrypted_key = decrypt_private_key(&account.encrypted_key).unwrap();
+
+        let account_keypair =
+            Keypair::from_secret_key(std::str::from_utf8(&decrypted_key).unwrap()).unwrap();
+
+        Ok((account, account_keypair))
     }
 }

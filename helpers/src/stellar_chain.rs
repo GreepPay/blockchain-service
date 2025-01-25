@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use anyhow::Error;
 use reqwest::Response;
-use stellar_base::{amount::Stroops, asset::CreditAsset, operations::{ChangeTrustOperationBuilder, CreateAccountOperationBuilder, PaymentOperationBuilder}, time_bounds::TimeBounds, Asset, KeyPair, Network, PublicKey, Transaction};
+use stellar_base::{amount::Stroops, operations::{ChangeTrustOperationBuilder, CreateAccountOperationBuilder, PaymentOperationBuilder}, time_bounds::TimeBounds, Asset, KeyPair, Network, PublicKey, Transaction};
 use stellar_sdk::{Keypair, Server};
 use stellar_base::xdr::XDRSerialize;
 
@@ -16,7 +16,7 @@ pub struct NewStellarAccount {
 
 /// Handles interactions with the Stellar blockchain network
 pub struct StellarChain {
-    client: Server,
+    pub client: Server,
     network: Network,
     server_url: String,
 }
@@ -38,7 +38,6 @@ impl StellarChain {
     pub fn create_new_account(&self) -> Result<NewStellarAccount, Error> {
         // Generate a random key pair
          let mut new_keypair = Keypair::random().unwrap();
-
          let secret_key = new_keypair.secret_key().unwrap();
          let public_key = new_keypair.public_key();
 
@@ -110,14 +109,17 @@ impl StellarChain {
     /// 
     /// # Returns
     /// * `Result<Response, Error>` - The transaction response or an error
-    pub async fn establish_trustline_for_asset(&self, keypair: Keypair, asset: CreditAsset) -> Result<Response, Error> {
+    pub async fn establish_trustline_for_asset(&self, keypair: Keypair, asset: Asset) -> Result<Response, Error> {
          let receiver_account = stellar_base::PublicKey::from_account_id(keypair.public_key().as_str()).unwrap();
 
          let time_bounds = TimeBounds::always_valid();
 
          let trust_operation_builder = ChangeTrustOperationBuilder::new();
 
-         let asset = Asset::Credit(asset);
+        //  If not credit asset throw error
+        if !matches!(asset, Asset::Credit(_)) {
+            return Err(anyhow::anyhow!("Asset is not a credit asset"));
+        }
 
          let trust_operation = trust_operation_builder
             .with_source_account(receiver_account.clone())
@@ -164,7 +166,7 @@ impl StellarChain {
     /// 
     /// # Returns
     /// * `Result<Response, Error>` - The transaction response or an error
-    pub async fn send_asset(&self, sender_keypair: Keypair, receiver_pub_key: String, asset: CreditAsset, amount: u64) -> Result<Response, Error> {
+    pub async fn send_asset(&self, sender_keypair: Keypair, receiver_pub_key: String, asset: Asset, amount: u64) -> Result<Response, Error> {
 
         let sender_account = stellar_base::PublicKey::from_account_id(sender_keypair.public_key().as_str()).unwrap();
 
@@ -176,8 +178,6 @@ impl StellarChain {
 
         // Convert amount to stroops
         let amount_in_stroops = Stroops::new((amount * 1000000000).try_into().unwrap());
-
-        let asset = Asset::Credit(asset);
 
         let payment_operation = payment_operation_builder
             .with_source_account(sender_account.clone())
@@ -277,10 +277,10 @@ mod tests {
         // Create a test asset
         let asset_code = "TEST";
         let issuer = "GAW2GOKRA6N63LPZ5YCR6NGR4KKX3EG72HW2MN5SKJE43HKMQQ4R66V4";
-        let asset =  CreditAsset::new(
+        let asset = Asset::Credit(CreditAsset::new(
                 asset_code.to_string(),
                 stellar_base::PublicKey::from_account_id(issuer).unwrap()
-            ).unwrap();
+            ).unwrap());
 
         // Note: This test requires the account to be funded first
         let result = chain.establish_trustline_for_asset(keypair, asset).await;
@@ -303,10 +303,10 @@ mod tests {
         // Create a test asset
         let asset_code = "TEST";
         let issuer = "GAW2GOKRA6N63LPZ5YCR6NGR4KKX3EG72HW2MN5SKJE43HKMQQ4R66V4";
-        let asset = CreditAsset::new(
+        let asset = Asset::Credit(CreditAsset::new(
                 asset_code.to_string(),
                 stellar_base::PublicKey::from_account_id(issuer).unwrap()
-            ).unwrap();
+            ).unwrap());
 
         // Note: This test requires funded accounts and established trustlines
         let result = chain.send_asset(
@@ -343,10 +343,10 @@ mod tests {
         // Create a test asset
         let asset_code = "TEST";
         let issuer = "GAW2GOKRA6N63LPZ5YCR6NGR4KKX3EG72HW2MN5SKJE43HKMQQ4R66V4";
-        let asset = CreditAsset::new(
+        let asset = Asset::Credit(CreditAsset::new(
                 asset_code.to_string(),
                 stellar_base::PublicKey::from_account_id(issuer).unwrap()
-            ).unwrap();
+            ).unwrap());
 
         // Establish trustlines for both accounts
         chain.establish_trustline_for_asset(sender_keypair.clone(), asset.clone()).await.unwrap();
