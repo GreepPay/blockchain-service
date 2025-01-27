@@ -5,7 +5,6 @@ pub mod payment {
     use anyhow::Error;
     use bigdecimal::BigDecimal;
     use helpers::stellar_chain::StellarChain;
-    use reqwest::Response;
     use stellar_base::asset::{Asset, CreditAsset};
     use stellar_base::PublicKey;
 
@@ -15,12 +14,12 @@ pub mod payment {
         account_id: String,
         asset_code: &str,
         asset_issuer: &str,
-    ) -> Result<Response, Error> {
+    ) -> Result<bool, Error> {
         let network = get_chain_network()?;
         let stellar_chain = StellarChain::new(std::env::var("STELLAR_HORIZON_URL")?, network);
 
         // Retrieve the account and keypair from the database
-        let (account, keypair) = get_account_from_id(account_id).await?;
+        let (_account, keypair) = get_account_from_id(account_id).await?;
 
         // Create the custom asset
         let credit_asset = CreditAsset::new(
@@ -29,11 +28,11 @@ pub mod payment {
         )?;
 
         // Establish the trustline for the custom asset
-        let response = stellar_chain
+        stellar_chain
             .establish_trustline_for_asset(keypair, Asset::Credit(credit_asset))
             .await?;
 
-        Ok(response)
+        Ok(true)
     }
 
     /// Sends a native payment (XLM) and saves the transaction to the database.
@@ -41,7 +40,7 @@ pub mod payment {
         sender_account_id: String,
         receiver_public_key: &str,
         amount: u64,
-    ) -> Result<Response, Error> {
+    ) -> Result<bool, Error> {
         send_payment(
             sender_account_id,
             receiver_public_key,
@@ -59,7 +58,7 @@ pub mod payment {
         asset_code: &str,
         asset_issuer: &str,
         amount: u64,
-    ) -> Result<Response, Error> {
+    ) -> Result<bool, Error> {
         // Create the custom asset
         let asset = Asset::Credit(CreditAsset::new(
             asset_code.to_string(),
@@ -84,7 +83,7 @@ pub mod payment {
         asset: Asset, // Can be Native or Credit
         asset_code: String,
         amount: u64,
-    ) -> Result<Response, Error> {
+    ) -> Result<bool, Error> {
         let network = get_chain_network()?;
         let stellar_chain = StellarChain::new(std::env::var("STELLAR_HORIZON_URL")?, network);
 
@@ -103,7 +102,7 @@ pub mod payment {
 
         // Save the transaction to the database
         save_chain_transaction(
-            response.clone(),
+            response,
             PublicKey::from_account_id(&sender_account.stellar_address)?,
             PublicKey::from_account_id(receiver_public_key)?,
             asset_code,
@@ -111,6 +110,6 @@ pub mod payment {
         )
         .await?;
 
-        Ok(response)
+        Ok(true)
     }
 }
