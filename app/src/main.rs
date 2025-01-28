@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate rocket;
-// use app::routes;
+use app::routes;
 // use helpers::{asset_issuer::AssetIssuer, stellar_chain::StellarChain};
 // use stellar_base::Network;
 // use stellar_sdk::Keypair;
@@ -42,11 +42,10 @@ async fn rocket() -> _ {
     // Launch application
     rocket::build()
         .mount(
-            "/v1/users",
+            "/v1/accounts",
             routes![
-                // routes::auth::auth::get_users,
-                // routes::auth::auth::add_user,
-                // routes::auth::auth::update_user
+                routes::account::account::get_single_account,
+                routes::account::account::create_account
             ],
         )
 }
