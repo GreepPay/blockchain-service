@@ -5,12 +5,10 @@ use app::routes;
 // use stellar_base::Network;
 // use stellar_sdk::Keypair;
 
-
 #[launch]
 async fn rocket() -> _ {
     // Load env
     dotenv::dotenv().ok();
-    
 
     // Initialize asset issuer Do this only once
     // let asset_issuer = AssetIssuer::new(
@@ -35,17 +33,23 @@ async fn rocket() -> _ {
 
     // stellar_chain.activate_account(account_keypair).await.unwrap();
 
-
     // Generate encryption key and iv. Use when generating a new key.
     // helpers::common::generate_encryption_key_and_iv();
 
     // Launch application
-    rocket::build()
-        .mount(
-            "/v1/accounts",
-            routes![
-                routes::account::account::get_single_account,
-                routes::account::account::create_account
-            ],
-        )
+    rocket::build().mount(
+        "/v1/accounts",
+        routes![
+            account::get_single_account,
+            account::create_account,
+            account::activate_account,
+            account::update_account,
+            account::soft_delete_account,
+            account::get_many_accounts,
+            account::get_account_by_stellar_address,
+            payment::establish_trustline_for_non_native_asset,
+            payment::send_native_payment,
+            payment::send_non_native_payment
+        ],
+    )
 }
