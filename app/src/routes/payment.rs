@@ -69,11 +69,3 @@ pub mod payment {
         ))
     }
 }
-
-pub fn get_payment_routes() -> Vec<Route> {
-    routes![
-        payment::establish_trustline_for_non_native_asset,
-        payment::send_native_payment,
-        payment::send_non_native_payment,
-    ]
-}

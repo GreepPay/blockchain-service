@@ -37,19 +37,25 @@ async fn rocket() -> _ {
     // helpers::common::generate_encryption_key_and_iv();
 
     // Launch application
-    rocket::build().mount(
-        "/v1/accounts",
-        routes![
-            account::get_single_account,
-            account::create_account,
-            account::activate_account,
-            account::update_account,
-            account::soft_delete_account,
-            account::get_many_accounts,
-            account::get_account_by_stellar_address,
-            payment::establish_trustline_for_non_native_asset,
-            payment::send_native_payment,
-            payment::send_non_native_payment
-        ],
-    )
+    rocket::build()
+        .mount(
+            "/v1/accounts",
+            routes![
+                account::get_single_account,
+                account::create_account,
+                account::activate_account,
+                account::update_account,
+                account::soft_delete_account,
+                account::get_many_accounts,
+                account::get_account_by_stellar_address
+            ],
+        )
+        .mount(
+            "/v1/payment",
+            routes![
+                payment::establish_trustline,
+                payment::send_native,
+                payment::send_non_native
+            ],
+        )
 }
