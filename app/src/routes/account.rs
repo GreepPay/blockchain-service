@@ -2,11 +2,11 @@ pub mod account {
     use controllers::{
         account::form::form::{
             ActivateAccountForm, CreateAccountForm, GetAccountByStellarAddressForm,
-            GetManyAccountsForm, GetSingleAccountForm, SoftDeleteAccountForm, UpdateAccountForm,
+            GetSingleAccountForm, SoftDeleteAccountForm, UpdateAccountForm,
         },
         api::api::{failure, success, ApiResponse},
     };
-    use models::{common::Pagination, models::Account};
+    use models::models::Account;
     use rocket::{form::Form, get, http::Status, post, response::status, serde::json::Json};
 
     #[get("/<account_id>")]
@@ -14,9 +14,7 @@ pub mod account {
         account_id: &str,
     ) -> Result<status::Custom<Json<ApiResponse<Account>>>, status::Custom<Json<ApiResponse<()>>>>
     {
-        let get_single_account = GetSingleAccountForm {
-            account_id: account_id,
-        };
+        let get_single_account = GetSingleAccountForm { account_id };
 
         let single_account =
             controllers::account::get_single_account_controller(Form::from(get_single_account))
@@ -92,27 +90,6 @@ pub mod account {
         Ok(success(
             "Account deleted successfully",
             delete_result,
-            Status::Ok,
-        ))
-    }
-
-    #[get("/many?<page>")]
-    pub async fn get_many_accounts(
-        page: i64,
-    ) -> Result<
-        status::Custom<Json<ApiResponse<Pagination<Account>>>>,
-        status::Custom<Json<ApiResponse<()>>>,
-    > {
-        let get_many_accounts = GetManyAccountsForm { page };
-
-        let accounts =
-            controllers::account::get_many_accounts_controller(Form::from(get_many_accounts))
-                .await
-                .map_err(|_| failure("Failed to get many accounts", Status::InternalServerError))?;
-
-        Ok(success(
-            "Accounts fetched successfully",
-            accounts,
             Status::Ok,
         ))
     }

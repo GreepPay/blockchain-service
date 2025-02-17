@@ -11,7 +11,7 @@ use diesel::sql_types::BigInt;
 use diesel_async::methods::LoadQuery;
 
 /// Trait for adding pagination capabilities to queries
-/// 
+///
 /// This trait provides the ability to paginate any query by implementing
 /// a single method `paginate`.
 pub trait Paginate: Sized {
@@ -33,7 +33,7 @@ impl<T> Paginate for T {
 const DEFAULT_PER_PAGE: i64 = 10;
 
 /// Structure representing a paginated query
-/// 
+///
 /// # Fields
 /// * `query` - The underlying query being paginated
 /// * `page` - Current page number (1-based)
@@ -49,7 +49,7 @@ pub struct Paginated<T> {
 
 impl<T> Paginated<T> {
     /// Sets the number of items per page
-    /// 
+    ///
     /// # Arguments
     /// * `per_page` - Number of items to display per page
     pub fn per_page(self, per_page: i64) -> Self {
@@ -61,7 +61,7 @@ impl<T> Paginated<T> {
     }
 
     /// Executes the paginated query and returns the results along with pagination metadata
-    /// 
+    ///
     /// # Returns
     /// A tuple containing:
     /// * Vector of query results
@@ -70,7 +70,7 @@ impl<T> Paginated<T> {
     /// * Number of items per page
     pub async fn load_and_count_pages<'a, U>(
         self,
-        conn: &mut AsyncPgConnection
+        conn: &mut AsyncPgConnection,
     ) -> QueryResult<(Vec<U>, i64, i64, i64)>
     where
         T: 'a,
@@ -108,7 +108,7 @@ where
 }
 
 /// Structure containing paginated results and metadata
-/// 
+///
 /// # Fields
 /// * `data` - Vector of paginated items
 /// * `total_pages` - Total number of available pages
@@ -124,12 +124,11 @@ pub struct Pagination<T> {
 }
 
 /// Establishes a connection to the PostgreSQL database using environment variables
-/// 
+///
 /// # Returns
 /// * `Ok(AsyncPgConnection)` - Successfully established database connection
 /// * `Err(ConnectionError)` - Failed to establish connection
 pub async fn establish_connection() -> Result<AsyncPgConnection, ConnectionError> {
-
     let db_url = std::env::var("DATABASE_URL").unwrap();
 
     dotenv::dotenv().ok();
