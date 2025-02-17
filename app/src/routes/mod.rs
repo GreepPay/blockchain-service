@@ -1,3 +1,3 @@
-// pub mod auth;
-// pub mod notification;
 pub mod account;
+pub mod notification;
+pub mod payment;

@@ -6,7 +6,7 @@ pub mod account {
         },
         api::api::{failure, success, ApiResponse},
     };
-    use models::models::Account;
+    use models::{common::Pagination, models::Account};
     use rocket::{form::Form, get, http::Status, post, response::status, serde::json::Json};
 
     #[get("/<account_id>")]
