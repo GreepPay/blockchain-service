@@ -21,7 +21,7 @@ pub async fn establish_trustline_for_non_native_asset_controller<'r>(
 }
 
 /// Send a native payment (XLM).
-pub async fn send_native_payment_controller_controller<'r>(
+pub async fn send_native_payment_controller<'r>(
     form: Form<SendNativePaymentForm<'r>>,
 ) -> Result<bool, Box<dyn std::error::Error>> {
     Ok(send_native_payment(

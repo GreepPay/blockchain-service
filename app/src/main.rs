@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate rocket;
-use app::routes;
+use app::routes::{account::account, payment::payment};
 // use helpers::{asset_issuer::AssetIssuer, stellar_chain::StellarChain};
 // use stellar_base::Network;
 // use stellar_sdk::Keypair;
@@ -46,16 +46,15 @@ async fn rocket() -> _ {
                 account::activate_account,
                 account::update_account,
                 account::soft_delete_account,
-                account::get_many_accounts,
                 account::get_account_by_stellar_address
             ],
         )
         .mount(
             "/v1/payment",
             routes![
-                payment::establish_trustline,
-                payment::send_native,
-                payment::send_non_native
+                payment::establish_trustline_for_non_native_asset,
+                payment::send_native_payment,
+                payment::send_non_native_payment
             ],
         )
 }

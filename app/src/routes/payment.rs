@@ -1,15 +1,15 @@
 pub mod payment {
-    use controllers::api::api::{failure, success, ApiResponse};
-    use controllers::payment::form::{
-        EstablishTrustlineForm, SendNativePaymentForm, SendNonNativePaymentForm,
+    use controllers::{
+        api::api::{failure, success, ApiResponse},
+        payment::form::form::{
+            EstablishTrustlineForm, SendNativePaymentForm, SendNonNativePaymentForm,
+        },
+        payment::{
+            establish_trustline_for_non_native_asset_controller, send_native_payment_controller,
+            send_non_native_payment_controller,
+        },
     };
-    use controllers::payment::{
-        establish_trustline_for_non_native_asset_controller, send_native_payment_controller,
-        send_non_native_payment_controller,
-    };
-    use rocket::form::Form;
-    use rocket::Route;
-    use rocket::{get, http::Status, post, response::status, serde::json::Json};
+    use rocket::{form::Form, http::Status, post, response::status, serde::json::Json};
 
     #[post("/trustline", data = "<form>")]
     pub async fn establish_trustline_for_non_native_asset(
