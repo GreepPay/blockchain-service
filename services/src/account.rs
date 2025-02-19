@@ -251,7 +251,7 @@ pub mod account {
 
         diesel::update(models::schema::accounts::table)
             .filter(models::schema::accounts::id.eq(account_uuid))
-            .set(models::schema::accounts::status.eq("closed"))
+            .set(models::schema::accounts::status.eq("deleted"))
             .execute(&mut db_connection)
             .await?;
 
