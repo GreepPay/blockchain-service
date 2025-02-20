@@ -4,7 +4,7 @@ CREATE TABLE accounts (
     account_type TEXT NOT NULL CHECK (account_type IN ('issuer', 'distributor', 'user')),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    status TEXT NOT NULL CHECK (status IN ('active', 'suspended', 'closed'))
+    status TEXT NOT NULL CHECK (status IN ('active', 'suspended', 'closed','deleted'))
 );
 
 CREATE TABLE trustlines (
