@@ -1,9 +1,8 @@
-use diesel::{Insertable, Queryable, Selectable};
-use serde::{Serialize, Deserialize};
-use chrono::NaiveDateTime;
-use uuid::Uuid;
 use bigdecimal::BigDecimal;
-
+use chrono::NaiveDateTime;
+use diesel::{Insertable, Queryable, Selectable};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::schema::*;
 
@@ -34,7 +33,7 @@ pub struct Trustline {
 }
 
 #[derive(Insertable)]
-#[table_name = "trustlines"]
+#[diesel(table_name = trustlines)]
 pub struct NewTrustline<'a> {
     pub account_id: Uuid,
     pub asset_code: &'a str,
@@ -59,7 +58,7 @@ pub struct Transaction {
 }
 
 #[derive(Insertable)]
-#[table_name = "transactions"]
+#[diesel(table_name = transactions)]
 pub struct NewTransaction<'a> {
     pub id: Uuid,
     pub source_account_id: Uuid,
@@ -84,7 +83,7 @@ pub struct TransactionError {
 }
 
 #[derive(Insertable)]
-#[table_name = "transaction_errors"]
+#[diesel(table_name = transaction_errors)]
 pub struct NewTransactionError<'a> {
     pub transaction_id: Uuid,
     pub error_code: &'a str,
