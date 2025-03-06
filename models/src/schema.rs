@@ -14,9 +14,25 @@ diesel::table! {
 diesel::table! {
     encrypted_keys (id) {
         id -> Uuid,
-        account_id -> Uuid,
-        encrypted_key -> Binary,
+        account_id -> Nullable<Uuid>,
+        encrypted_key -> Bytea,
         created_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    store (prefix, key) {
+        prefix -> Text,
+        key -> Text,
+        value -> Jsonb,
+        created_at -> Nullable<Timestamptz>,
+        updated_at -> Nullable<Timestamptz>,
+    }
+}
+
+diesel::table! {
+    store_migrations (v) {
+        v -> Int4,
     }
 }
 
@@ -66,6 +82,16 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    user (id) {
+        id -> Int4,
+        createdAt -> Timestamp,
+        updatedAt -> Timestamp,
+        name -> Varchar,
+        email -> Varchar,
+    }
+}
+
 diesel::joinable!(encrypted_keys -> accounts (account_id));
 diesel::joinable!(tokens -> accounts (issuer_account_id));
 diesel::joinable!(transaction_errors -> transactions (transaction_id));
@@ -74,8 +100,11 @@ diesel::joinable!(trustlines -> accounts (account_id));
 diesel::allow_tables_to_appear_in_same_query!(
     accounts,
     encrypted_keys,
+    store,
+    store_migrations,
     tokens,
     transaction_errors,
     transactions,
     trustlines,
+    user,
 );
