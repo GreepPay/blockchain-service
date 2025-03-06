@@ -182,7 +182,6 @@ pub mod account {
         if account.status == "active" {
             return Err(anyhow::anyhow!("Account already active"));
         }
-
         // Activate account on chain
         let network = common::get_chain_network().unwrap();
         let stellar_chain =
