@@ -1,15 +1,15 @@
 [package]
 name = "models"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-chrono = { version = "0.4.38", features = ["serde"] }
-rocket = "0.5.1"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-diesel = { version = "2.2.6", features = ["chrono", "uuid", "numeric"] }
-dotenv = "0.15.0"
-diesel-async = { version = "0.5.2", features = ["postgres"] }
-uuid = { version = "1.0", features = ["serde"] }
-bigdecimal = { version = "0.4.7" }
+chrono.workspace = true
+rocket.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+diesel.workspace = true
+dotenv.workspace = true
+diesel-async.workspace = true
+uuid.workspace = true
+bigdecimal.workspace = true
